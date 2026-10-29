@@ -643,7 +643,14 @@ details.presentation-help summary { min-height: 44px; padding: 10px 0; cursor: p
 .identifier-message { border-left: 3px solid var(--color-taupe); padding: 15px 19px; background: #f9f6ed; border-radius: 0 8px 8px 0; margin-bottom: 18px; }
 [data-state="identifier-match"] .identifier-message { border-left-color: #AD5A50; background: #F3DEDA; }
 [data-state="identifier-similar"] .identifier-message { border-left-color: #B28A50; background: #EEE0C9; }
-[data-state="identifier-unmatched"] .identifier-message { border-left-color: var(--color-olive); background: var(--color-sage); }
+[data-state="identifier-unmatched"] .identifier-message { border-left-color: #78999F; background: #DDE9EB; }
+.source-citation { margin: 12px 0 20px; font-size: 11px; line-height: 1.8; }
+.source-citation .source-link { display: inline; font-size: inherit; overflow-wrap: anywhere; }
+.medical-notice { padding: 15px 17px; margin-top: 18px; border-left: 3px solid var(--color-taupe); border-radius: 0 8px 8px 0; background: var(--color-cream); font-size: 12px; line-height: 1.85; }
+.dipa-contact-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.dipa-contact-actions .button { max-width: 100%; white-space: normal; text-align: center; }
+.dipa-contact-actions .secondary { border: 1px solid var(--color-olive); background: var(--color-cream); }
+.dipa-contact-actions .secondary:hover { background: #E9ECDF; }
 .identifier-message { overflow-wrap: anywhere; }
 .identifier-safety { padding: 14px 17px; border: 1px solid var(--color-taupe); border-radius: 8px; background: var(--color-cream); }
 .date-comparison { margin-top: 15px; padding-top: 12px; border-top: 1px solid var(--line); }
@@ -669,6 +676,7 @@ details.presentation-help summary { min-height: 44px; padding: 10px 0; cursor: p
 .result-recommendations { padding: 23px; margin: 27px 0; border-radius: 11px; background: #dce7d0; }
 .result-recommendations ul { margin-bottom: 0; }
 .result-source { min-height: 50px; margin-bottom: 22px; }
+.result-section .result-source { max-width: 100%; white-space: normal; text-align: center; }
 .product-data { border-top: 1px solid #c1d0cc; border-bottom: 1px solid #c1d0cc; padding: 8px 0; }
 .product-data summary { padding: 10px 0; font-size: 13px; font-weight: 600; cursor: pointer; }
 .product-data dl { margin: 15px 0; }

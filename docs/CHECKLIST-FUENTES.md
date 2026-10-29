@@ -22,7 +22,7 @@ Los casilleros se completan luego de la revisión humana del despliegue que se p
 
 - [ ] Abrir el sitio y confirmar que el JSON carga sin errores de validación.
 - [ ] Verificar que inicio, consulta guiada y tarjetas lean correctamente los registros del JSON.
-- [ ] Revisar en móvil y escritorio las dos marcas y sus ramas: Nutrilon con dos presentaciones sin pedir lote; SanCor con la inscripción DIPA completa y la referencia adicional diferenciadas.
+- [ ] Revisar en móvil y escritorio las dos marcas y sus ramas: Nutrilon con dos presentaciones sin pedir lote; SanCor únicamente con la inscripción DIPA completa como referencia.
 - [ ] Probar coincidencia exacta, una y dos ediciones (incluidas transposiciones), O/0 e I/1, código distinto, vacío, fragmentos y separadores de formato. No deben aparecer aprobaciones de seguridad ni correcciones automáticas.
 - [ ] Confirmar que uno o dos caracteres faltantes produzcan una advertencia de similitud; códigos demasiado cortos y prefijos a más de dos ediciones deben pedir la inscripción completa.
 - [ ] Comparar visualmente elaboración 10/01/26 y vencimiento 10/01/27 con el comunicado; verificar checklist opcional, advertencia persistente y apertura de recomendaciones al marcar una diferencia del envase.

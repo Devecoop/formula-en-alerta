@@ -17,9 +17,6 @@
       "lots": [
         "L:Y010 F-011207563"
       ],
-      "comparisonIdentifiers": [
-        "L F-011207563"
-      ],
       "lotAvailability": "published",
       "manufactured": "10/01/2026",
       "expires": "10/01/2027",
@@ -57,7 +54,7 @@
         }
       ],
       "sourceUrl": "https://www.gba.gob.ar/desarrollo_agrario/alertas_alimentarias/sancor-bebe",
-      "sourceTitle": "DIPA · Alerta alimentaria: SanCor Bebé 1 Advanced",
+      "sourceTitle": "ALERTA ALIMENTARIA - PRODUCTO FALSIFICADO",
       "reviewedAt": "2026-10-29",
       "presentationLabel": "SanCor Bebé 1 Advanced"
     },
@@ -105,10 +102,15 @@
           "label": "DIPA · correo",
           "value": "vigilancia.dipa@mda.gba.gob.ar",
           "url": "mailto:vigilancia.dipa@mda.gba.gob.ar"
+        },
+        {
+          "label": "DIPA · teléfono",
+          "value": "(0221) 422-4634",
+          "url": "tel:+542214224634"
         }
       ],
       "sourceUrl": "https://gba.gob.ar/desarrollo_agrario/alertas_alimentarias/nutrilon1",
-      "sourceTitle": "DIPA · Alerta alimentaria: Nutrilon AR1",
+      "sourceTitle": "ALERTA ALIMENTARIA - PRODUCTO FALSIFICADO",
       "reviewedAt": "2026-10-29",
       "presentationLabel": "Nutrilon AR1 — de 0 a 6 meses"
     },
@@ -149,10 +151,15 @@
           "label": "DIPA · correo",
           "value": "vigilancia.dipa@mda.gba.gob.ar",
           "url": "mailto:vigilancia.dipa@mda.gba.gob.ar"
+        },
+        {
+          "label": "DIPA · teléfono",
+          "value": "(0221) 422-4634",
+          "url": "tel:+542214224634"
         }
       ],
       "sourceUrl": "https://www.gba.gob.ar/desarrollo_agrario/alertas_alimentarias/nutrilon",
-      "sourceTitle": "DIPA · Alerta alimentaria: Nutrilon, fórmula láctea",
+      "sourceTitle": "ALERTA ALIMENTARIA - PRODUCTO FALSIFICADO",
       "reviewedAt": "2026-10-29",
       "presentationLabel": "Nutrilon fórmula láctea con prebióticos"
     }

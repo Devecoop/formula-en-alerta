@@ -19,7 +19,7 @@ function identifierDistance(left, right) {
 
 function compareIdentifier(value, alert) {
 	const code = normalizeLot(value);
-	const references = [...alert.lots, ...(alert.comparisonIdentifiers || [])].map(normalizeLot);
+	const references = alert.lots.map(normalizeLot);
 	if (!code || code.length > 120 || !/^[A-Z0-9]+$/.test(code)) return 'invalid';
 	if (references.includes(code)) return 'identifier-match';
 	// Se admiten hasta dos caracteres faltantes; fragmentos más cortos requieren la inscripción completa.
@@ -51,7 +51,6 @@ function validateDatabase(db) {
     if (!dateValid(a.publishedAt) || !dateValid(a.reviewedAt) || a.reviewedAt < a.publishedAt) errors.push(`${id}: fechas inválidas.`);
     for (const field of ['rne','rnpa','manufactured','expires']) if (a[field] !== null && !nonempty(a[field])) errors.push(`${id}: ${field} debe ser texto o null.`);
     for (const field of ['aliases','lots','irregularities','recommendations']) if (!strings(a[field])) errors.push(`${id}: ${field} debe ser una lista de textos.`);
-    if (a.comparisonIdentifiers !== undefined && !strings(a.comparisonIdentifiers)) errors.push(`${id}: referencias de comparación inválidas.`);
     if (!a.recommendations?.length) errors.push(`${id}: recomendaciones obligatorias.`);
     if (!['published','not_published'].includes(a.lotAvailability) || (a.lotAvailability === 'published') !== (a.lots?.length > 0)) errors.push(`${id}: disponibilidad de lote inconsistente.`);
     if (!Array.isArray(a.contacts) || a.contacts.some(c => !c || !nonempty(c.label) || !nonempty(c.value) || !/^(https:\/\/wa\.me\/\d+|mailto:[^\s]+@[^\s]+|tel:[+\d]+)$/.test(c.url))) errors.push(`${id}: contacto inválido.`);
@@ -63,6 +62,8 @@ const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'
 const formatDate = date => new Intl.DateTimeFormat('es-AR',{day:'2-digit',month:'short',year:'numeric',timeZone:'UTC'}).format(new Date(date+'T12:00:00Z'));
 const icon = (name, base='./') => `<svg class="icon" aria-hidden="true"><use href="${base}assets/icons.svg#${name}"></use></svg>`;
 const sourceLink = (a,base='./', label='Comunicado oficial') => `<a class="source-link" href="${escapeHtml(a.sourceUrl)}" target="_blank" rel="noopener noreferrer">${label} ${icon('external',base)}<span class="sr-only"> (abre una pestaña nueva)</span></a>`;
+const sourceCitation = (a, base = './') => `<p class="source-citation">Fuente: ${sourceLink(a, base, `${escapeHtml(a.agency.split(' · ')[0])} · «${escapeHtml(a.sourceTitle)}» · ${formatDate(a.publishedAt)}`)}</p>`;
+const medicalNotice = '<p class="medical-notice"><strong>Importante: información orientativa.</strong> No reemplaza la consulta pediátrica ni las indicaciones de las autoridades sanitarias. Ante síntomas o sospecha sobre el producto, consultá al pediatra y seguí las recomendaciones oficiales.</p>';
 let cardSequence = 0;
 function card(a, base = './', state = null) {
 	const backId = `card-back-${++cardSequence}`;
@@ -102,9 +103,11 @@ function card(a, base = './', state = null) {
 					<p class="eyebrow">${escapeHtml(a.agency.split(' · ')[0])} · ${formatDate(a.publishedAt)}</p>
 					<h3 class="card-back-heading" id="${backId}-title">${product}</h3>
 					<div class="card-back-content" tabindex="0" aria-label="Recomendaciones y datos de ${product}">
+						${sourceCitation(a, base)}
 						${matchNote ? `<p class="match-note">${matchNote}</p>` : ''}
 						<h4>Qué recomienda el organismo</h4>
 						<ul>${list(a.recommendations)}</ul>
+						${medicalNotice}
 						<h4>Sobre el lote</h4>
 						<p>${escapeHtml(a.lotNote)}</p>
 						${a.lots.length ? `<p><strong>${a.lots.map(escapeHtml).join(' · ')}</strong>${a.manufactured ? `<br>Elaboración: ${escapeHtml(a.manufactured)} · Vencimiento: ${escapeHtml(a.expires)}` : ''}</p>` : ''}
@@ -254,13 +257,14 @@ function showGuidedResult(a, identifierState = null, target = resultPanel) {
 	const numericDate = formatNumericDate(a.publishedAt);
 	const isPublished = a.lotAvailability === 'published';
 	const isSanCor = a.brand === 'SanCor';
+	const dipaContacts = a.contacts.filter(contact => contact.label.startsWith('DIPA') && /^(tel:|https:\/\/wa\.me\/)/.test(contact.url));
 	const list = items => items.map(item => `<li>${e(item)}</li>`).join('');
 	let identifierMessage = '';
 	if (identifierState !== null) {
 		const messages = {
-			'identifier-match': ['Coincidencia exacta del código', 'El código ingresado coincide con una de las referencias comparadas. Esto no confirma, por sí solo, que el producto sea falsificado. Revisá también el envase y las fechas publicadas por la DIPA.'],
-			'identifier-similar': ['El código es similar', 'Hay una o dos diferencias de caracteres, o de su orden, con una referencia comparada. Puede haber un error de escritura: revisá la inscripción completa. No podemos afirmar que sea el código publicado ni que el producto sea falsificado.'],
-			'identifier-unmatched': ['No encontramos coincidencia', 'No se encontró coincidencia con el identificador oficial disponible ni con la otra referencia comparada. Esto no certifica la autenticidad ni la seguridad del producto. Revisá también el envase y las fechas.']
+			'identifier-match': ['El código coincide con el publicado en una alerta oficial', 'Esto no confirma, por sí solo, que el producto sea falsificado. Revisá también las características del envase y las fechas publicadas por la DIPA.'],
+			'identifier-similar': ['El código es similar', 'Hay una o dos diferencias de caracteres: pueden faltar, sobrar, ser distintos o estar en otro orden. Puede haber un error de escritura: revisá la inscripción completa. No podemos afirmar que sea el código publicado ni que el producto sea falsificado.'],
+			'identifier-unmatched': ['No encontramos coincidencias en nuestra base actual de alertas oficiales', 'Esto no garantiza que el producto sea auténtico o seguro. La base es parcial. Revisá las diferencias del envase descriptas por DIPA y consultá las fuentes oficiales o al fabricante.']
 		};
 		const [title, description] = messages[identifierState];
 		identifierMessage = `<div class="identifier-message"><p><strong>${title}</strong></p><p>${description}</p><p>Ingresaste: <strong>${e(lotInput.value)}</strong></p></div>`;
@@ -278,25 +282,29 @@ function showGuidedResult(a, identifierState = null, target = resultPanel) {
 			${inline ? '' : `<p class="eyebrow">LA INFORMACIÓN DE TU PRODUCTO</p><h3 id="result-title" tabindex="-1">${e(a.brand + ' ' + a.name)}</h3>`}
 			<p class="result-meta">Alerta del <time datetime="${a.publishedAt}">${numericDate}</time> · Revisión: <time datetime="${a.reviewedAt}">${formatNumericDate(a.reviewedAt)}</time></p>
 			<p class="result-agency">${e(a.agency)}</p>
+			${sourceCitation(a)}
 			${inline ? '' : `<button type="button" id="change-selection" class="change-selection">${a.brand === 'Nutrilon' ? 'Elegir otra presentación' : 'Cambiar el lote'}</button>`}
 			<section class="result-section">
 				<h4>Qué pasó</h4>
 				${identifierMessage}
+				${isSanCor ? `<a class="button primary result-source" href="${e(a.sourceUrl)}" target="_blank" rel="noopener noreferrer">Leer el comunicado oficial ${icon('external')}<span class="sr-only"> (abre una pestaña nueva)</span></a>` : ''}
 				${isSanCor ? '<p class="identifier-safety"><strong>La ausencia de coincidencias no garantiza que el producto sea auténtico o seguro.</strong> Esta consulta no certifica productos.</p>' : ''}
 				<p>${e(a.reason)}</p>
 			</section>
 			<section class="result-section">
 				<h4>Qué mirar en el envase</h4>
 				<p${isPublished ? '' : ' class="unpublished-note"'}>${isPublished ? '' : '<strong>Lote no publicado.</strong> '}${e(a.lotNote)}</p>
-				${isPublished ? `<div class="published-identifier"><p>Inscripción completa publicada por DIPA: <strong>${a.lots.map(e).join(' · ')}</strong></p>${a.comparisonIdentifiers?.length ? `<p>También comparamos con esta referencia: <strong>${a.comparisonIdentifiers.map(e).join(' · ')}</strong></p>` : ''}${a.manufactured ? `<div class="date-comparison"><p>Fechas publicadas por DIPA. Comparalas con las de tu envase:</p><p>Elaboración: <strong>${e(a.manufactured.replace(/20(\d{2})$/, '$1'))}</strong></p><p>Vencimiento: <strong>${e(a.expires.replace(/20(\d{2})$/, '$1'))}</strong></p></div>` : ''}</div>` : ''}
-				${isSanCor ? `<details class="package-checklist"><summary>Revisar características del envase (opcional)</summary><p>Marcá solo las diferencias que reconocés en tu envase, según lo descripto por DIPA. Si no podés compararlas, podés dejar la lista sin marcar. No marcar ninguna tampoco garantiza seguridad.</p><fieldset><legend>Diferencias que informó la DIPA</legend>${a.irregularities.map(item => `<label><input type="checkbox" name="package-concern"><span>${e(item)}</span></label>`).join('')}</fieldset><p class="package-concern-message" role="status" hidden>Marcaste una característica sospechosa. Esto no confirma una falsificación. Revisá las recomendaciones de DIPA y el comunicado oficial que aparecen debajo.</p></details>` : a.irregularities.length ? `<div class="product-warning"><h5>Diferencias que informó la DIPA</h5><ul>${list(a.irregularities)}</ul></div>` : ''}
+				${isPublished ? `<div class="published-identifier"><p>Inscripción completa publicada por DIPA: <strong>${a.lots.map(e).join(' · ')}</strong></p>${a.manufactured ? `<div class="date-comparison"><p>Fechas publicadas por DIPA. Comparalas con las de tu envase:</p><p>Elaboración: <strong>${e(a.manufactured.replace(/20(\d{2})$/, '$1'))}</strong></p><p>Vencimiento: <strong>${e(a.expires.replace(/20(\d{2})$/, '$1'))}</strong></p></div>` : ''}</div>` : ''}
+				${isSanCor ? `<details class="package-checklist"><summary>Revisar características del envase (opcional)</summary><p>Marcá solo las diferencias que reconocés en tu envase, según lo descripto por DIPA. Si no podés compararlas, podés dejar la lista sin marcar. No marcar ninguna tampoco garantiza seguridad.</p><fieldset><legend>Diferencias que informó la DIPA</legend>${a.irregularities.map(item => `<label><input type="checkbox" name="package-concern"><span>${e(item)}</span></label>`).join('')}</fieldset><p class="package-concern-message" role="status" hidden>Marcaste una característica sospechosa. Esto no confirma una falsificación. Revisá las recomendaciones de DIPA debajo y consultá el comunicado oficial.</p></details>` : a.irregularities.length ? `<div class="product-warning"><h5>Diferencias que informó la DIPA</h5><ul>${list(a.irregularities)}</ul></div>` : ''}
 			</section>
-			${isSanCor ? `<details class="result-advice"${identifierState !== 'identifier-unmatched' ? ' open' : ''}><summary>Ver recomendaciones de DIPA y comunicado oficial</summary>` : ''}
+			${isSanCor ? `<details class="result-advice"${identifierState !== 'identifier-unmatched' ? ' open' : ''}><summary>Ver recomendaciones y contactos de DIPA</summary>` : ''}
 			<section class="result-recommendations">
 				<h4>Qué recomienda la DIPA</h4>
 				<ul>${recommendations}</ul>
+				${medicalNotice}
+				${dipaContacts.length ? `<div class="dipa-contact-actions" aria-label="Contactos oficiales de DIPA">${dipaContacts.map(contact => `<a class="button secondary" href="${e(contact.url)}"${contact.url.startsWith('https:') ? ' target="_blank" rel="noopener noreferrer"' : ''}>${contact.url.startsWith('tel:') ? 'Llamar a DIPA' : 'Consultar a DIPA por WhatsApp'}</a>`).join('')}</div>` : ''}
 			</section>
-			<a class="button primary result-source" href="${e(a.sourceUrl)}" target="_blank" rel="noopener noreferrer">Leer el comunicado oficial ${icon('external')}<span class="sr-only"> (abre una pestaña nueva)</span></a>
+			${isSanCor ? '' : `<a class="button primary result-source" href="${e(a.sourceUrl)}" target="_blank" rel="noopener noreferrer">Leer el comunicado oficial ${icon('external')}<span class="sr-only"> (abre una pestaña nueva)</span></a>`}
 			${isSanCor ? '</details>' : ''}
 			<details class="product-data">
 				<summary>Datos del producto</summary>
