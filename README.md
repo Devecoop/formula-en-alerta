@@ -53,6 +53,8 @@ Cada resultado y reverso de tarjeta identifica la fuente mediante organismo, tí
 
 El footer incluye el logo de Devecoop en tamaño pequeño en su línea inferior, enlazado al sitio institucional y sin una franja adicional. El texto legal breve permanece centrado. En las tarjetas recientes, «Ver recomendaciones» y «Volver al resumen» ocupan el mismo lugar inferior.
 
+La lectura usa Nunito con párrafos, advertencias y recomendaciones de `1rem` (16 px por defecto), datos secundarios de `.875rem` (14 px) e interlineado de 1,7, sin reducir el cuerpo en móvil. Las tarjetas usan dos columnas entre 761 y 1100 px y una en móvil. Sus controles forman parte del flujo para adaptarse al tamaño del texto y se apilan en pantallas de hasta 380 px. Revisar con texto ampliado al 200 %, espaciado personalizado y anchos desde 320 px.
+
 ## Publicar
 
 Subí `index.html`, `assets/`, `data/` y `.nojekyll` al hosting estático. En GitHub Pages podés servir la carpeta directamente, sin herramientas de construcción. Todas las rutas son relativas.
