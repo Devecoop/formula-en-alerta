@@ -29,8 +29,8 @@ body {
 	background: var(--color-cream);
 	color: var(--color-brown);
 	font-family: 'Nunito', 'Trebuchet MS', sans-serif;
-	font-size: 15px;
-	line-height: 1.8;
+	font-size: 1rem;
+	line-height: 1.7;
 }
 button, input { font: inherit; }
 button, a, summary { -webkit-tap-highlight-color: transparent; }
@@ -522,9 +522,8 @@ input::placeholder { color: #7d7066; opacity: 1; }
 	margin: 0;
 }
 .card-back-close .icon { transform: rotate(180deg); }
-.card-face { padding-bottom: 110px; }
-.card-face > .card-links { position: absolute; left: 23px; right: 23px; bottom: 49px; margin: 0; }
-.card-face > .review-date { position: absolute; left: 23px; right: 23px; bottom: 18px; margin: 0; }
+.card-face > .card-links { flex-shrink: 0; margin: 0; }
+.card-face > .review-date { flex-shrink: 0; margin: 13px 0 0; }
 .card-links > .source-link { flex-shrink: 0; }
 
 .card-back > .eyebrow { font-size: 9px; margin-bottom: 8px; }
@@ -556,7 +555,7 @@ input::placeholder { color: #7d7066; opacity: 1; }
 .legal-copy { display: block; max-width: 900px; margin-inline: auto; text-align: center; }
 
 @media (max-width: 760px) {
-	.card-face { padding: 23px 23px 110px; }
+	.card-face { padding: 23px; }
 	.source-panel { grid-template-columns: 1fr; gap: 25px; padding: 24px; }
 }
 
@@ -759,4 +758,109 @@ details.presentation-help summary { min-height: 44px; padding: 10px 0; cursor: p
 
 @media (max-width: 760px) {
 	.presentation-panel .consultation-result { padding: 22px 17px; }
+}
+
+/* Lectura: texto principal de 16 px y datos secundarios de 14 px,
+   relativos al tamaño elegido en el navegador y sin reducirlos en móvil. */
+.hero-description,
+.hero-scope,
+.service-copy p,
+.explanation-copy > p:not(.eyebrow),
+.section-heading p:not(.eyebrow),
+.card-reason,
+.card-back-content p,
+.card-back-content li,
+.guidance-grid > div > p:not(.eyebrow),
+.steps p,
+.source-panel p,
+.initiative-copy p,
+.legal-item p,
+.guided-heading > p:last-child,
+.presentation-help,
+.presentation-help p,
+.result-section > p,
+.result-section li,
+.result-recommendations li,
+.identifier-message p,
+.result-section .unpublished-note,
+.medical-notice,
+.search-notice p,
+.package-checklist p,
+.package-checklist label,
+.published-identifier p {
+	font-size: 1rem;
+	line-height: 1.7;
+}
+
+.legal-item p { font-size: .875rem; margin-bottom: 1rem; }
+.card-back-content h4 { font-size: 1rem; }
+.published-identifier strong { font-size: 1rem; }
+.hero-citations,
+.free-note,
+.brand-name,
+.card-lot,
+.card-lot strong,
+.card-top .eyebrow,
+.card-top time,
+.card-back > .eyebrow,
+.card-back-content .card-back-agency,
+.card-back-content .source-citation,
+.card-links,
+.card-links .source-link,
+.review-date,
+.coverage-line,
+.source-link,
+.source-panel > div > .source-link,
+#source-documents .source-link,
+#source-documents span:not(.sr-only),
+.source-citation,
+.contact-strip a,
+.contact-strip small,
+.contact-strip small a,
+.institutional-cta p,
+.institutional-cta a,
+.footer-top > span,
+.footer-top > a:last-child,
+.legal-copy p,
+.footer-bottom,
+.guide-status,
+.lot-feedback,
+#selected-sancor,
+.result-meta,
+.result-agency,
+.product-data dt,
+.product-data dd,
+.product-contacts,
+.product-contacts a {
+	font-size: .875rem;
+	line-height: 1.7;
+}
+
+.package-checklist summary,
+.package-checklist legend,
+.result-advice summary,
+.product-data summary { font-size: 1rem; }
+.button,
+.guided-lot-row .button,
+.result-source,
+.change-selection,
+.selection-summary button,
+.restart-consultation { font-size: .875rem; }
+
+.card-top { flex-wrap: wrap; }
+.card-top .eyebrow { max-width: none; }
+.card-top time { white-space: normal; }
+.card-links { min-height: 4rem; }
+.card-face .detail-link { min-height: 5.1em; overflow-wrap: anywhere; }
+.card-links > .source-link { flex-shrink: 1; }
+.card-links .icon { flex-shrink: 0; }
+
+@media (min-width: 761px) and (max-width: 1100px) {
+	.cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 380px) {
+	.card-links { flex-direction: column; align-items: stretch; gap: 0; }
+	.card-face .detail-link { flex: auto; min-height: 3.4em; }
+	.card-links > .source-link { min-height: 44px; }
 }
