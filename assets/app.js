@@ -309,14 +309,15 @@ document.querySelector('#presentation-options').addEventListener('click', event 
 lotForm.addEventListener('submit', event => {
 	event.preventDefault();
 	if (!selectedAlert || lotForm.hidden) return;
-	const identifier = normalizeLot(lotInput.value);
-	if (!identifier) {
+	const enteredLot = lotInput.value.trim().toUpperCase();
+	if (!/^L:Y\d{3} F-\d{9}$/.test(enteredLot)) {
 		clearGuidedResult();
-		document.querySelector('#lot-feedback').textContent = 'Escribí el lote completo tal como aparece en tu envase.';
+		document.querySelector('#lot-feedback').textContent = 'El formato no es válido. Usá 18 caracteres, con este formato: L:Y025 F-022308674.';
 		lotInput.setAttribute('aria-invalid', 'true');
 		lotInput.focus();
 		return;
 	}
+	const identifier = normalizeLot(enteredLot);
 	document.querySelector('#lot-feedback').textContent = '';
 	lotInput.removeAttribute('aria-invalid');
 	showGuidedResult(selectedAlert, selectedAlert.lots.some(lot => normalizeLot(lot) === identifier));
