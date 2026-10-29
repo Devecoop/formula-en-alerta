@@ -1,5 +1,32 @@
-// Solo se ignoran espacios y el prefijo de etiqueta «L:». Se conservan guiones y otros signos.
-const normalizeLot = value => String(value).normalize('NFKC').toUpperCase().trim().replace(/^L\s*:\s*/, '').replace(/\s+/g, '');
+// Solo se ignoran mayúsculas, espacios y separadores; nunca se sustituyen letras o números.
+const normalizeLot = value => String(value).toUpperCase().replace(/[\s:.,/_\-–—]/g, '');
+
+// Distancia de edición con transposiciones de caracteres contiguos (OSA).
+function identifierDistance(left, right) {
+	const rows = Array.from({length: left.length + 1}, (_, i) => [i]);
+	for (let j = 0; j <= right.length; j++) rows[0][j] = j;
+	for (let i = 1; i <= left.length; i++) {
+		for (let j = 1; j <= right.length; j++) {
+			rows[i][j] = Math.min(rows[i - 1][j] + 1, rows[i][j - 1] + 1,
+				rows[i - 1][j - 1] + (left[i - 1] === right[j - 1] ? 0 : 1));
+			if (i > 1 && j > 1 && left[i - 1] === right[j - 2] && left[i - 2] === right[j - 1]) {
+				rows[i][j] = Math.min(rows[i][j], rows[i - 2][j - 2] + 1);
+			}
+		}
+	}
+	return rows[left.length][right.length];
+}
+
+function compareIdentifier(value, alert) {
+	const code = normalizeLot(value);
+	const references = [...alert.lots, ...(alert.comparisonIdentifiers || [])].map(normalizeLot);
+	if (!code || code.length > 120 || !/^[A-Z0-9]+$/.test(code)) return 'invalid';
+	if (references.includes(code)) return 'identifier-match';
+	// Se admiten hasta dos caracteres faltantes; fragmentos más cortos requieren la inscripción completa.
+	if (code.length < Math.min(...references.map(ref => ref.length)) - 2) return 'incomplete';
+	if (references.some(ref => identifierDistance(code, ref) <= 2)) return 'identifier-similar';
+	return references.some(ref => ref.startsWith(code)) ? 'incomplete' : 'identifier-unmatched';
+}
 const dateValid = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(value)) && new Date(value).toISOString().slice(0,10) === value;
 const nonempty = value => typeof value === 'string' && value.trim().length > 0;
 const strings = value => Array.isArray(value) && value.every(nonempty);
@@ -24,6 +51,7 @@ function validateDatabase(db) {
     if (!dateValid(a.publishedAt) || !dateValid(a.reviewedAt) || a.reviewedAt < a.publishedAt) errors.push(`${id}: fechas inválidas.`);
     for (const field of ['rne','rnpa','manufactured','expires']) if (a[field] !== null && !nonempty(a[field])) errors.push(`${id}: ${field} debe ser texto o null.`);
     for (const field of ['aliases','lots','irregularities','recommendations']) if (!strings(a[field])) errors.push(`${id}: ${field} debe ser una lista de textos.`);
+    if (a.comparisonIdentifiers !== undefined && !strings(a.comparisonIdentifiers)) errors.push(`${id}: referencias de comparación inválidas.`);
     if (!a.recommendations?.length) errors.push(`${id}: recomendaciones obligatorias.`);
     if (!['published','not_published'].includes(a.lotAvailability) || (a.lotAvailability === 'published') !== (a.lots?.length > 0)) errors.push(`${id}: disponibilidad de lote inconsistente.`);
     if (!Array.isArray(a.contacts) || a.contacts.some(c => !c || !nonempty(c.label) || !nonempty(c.value) || !/^(https:\/\/wa\.me\/\d+|mailto:[^\s]+@[^\s]+|tel:[+\d]+)$/.test(c.url))) errors.push(`${id}: contacto inválido.`);
@@ -221,16 +249,21 @@ function selectBrand(brand) {
 	}
 }
 
-function showGuidedResult(a, identifierMatches = null, target = resultPanel) {
+function showGuidedResult(a, identifierState = null, target = resultPanel) {
 	const inline = target !== resultPanel;
 	const numericDate = formatNumericDate(a.publishedAt);
 	const isPublished = a.lotAvailability === 'published';
+	const isSanCor = a.brand === 'SanCor';
 	const list = items => items.map(item => `<li>${e(item)}</li>`).join('');
 	let identifierMessage = '';
-	if (identifierMatches !== null) {
-		identifierMessage = identifierMatches
-			? `<div class="identifier-message"><p><strong>El número de lote coincide con el mencionado en una alerta oficial.</strong></p><p>Revisá también las diferencias del envase que informó la DIPA. Que coincida el número no confirma, por sí solo, que un envase sea falsificado. Si sospechás del producto, no lo consumas y consultá el comunicado oficial.</p></div>`
-			: `<div class="identifier-message"><p><strong>El número de lote no coincide con el publicado en esta alerta.</strong></p><p>Esto no garantiza que el producto sea auténtico o seguro. Revisá también las diferencias del envase que informó la DIPA.</p></div>`;
+	if (identifierState !== null) {
+		const messages = {
+			'identifier-match': ['Coincidencia exacta del código', 'El código ingresado coincide con una de las referencias comparadas. Esto no confirma, por sí solo, que el producto sea falsificado. Revisá también el envase y las fechas publicadas por la DIPA.'],
+			'identifier-similar': ['El código es similar', 'Hay una o dos diferencias de caracteres, o de su orden, con una referencia comparada. Puede haber un error de escritura: revisá la inscripción completa. No podemos afirmar que sea el código publicado ni que el producto sea falsificado.'],
+			'identifier-unmatched': ['No encontramos coincidencia', 'No se encontró coincidencia con el identificador oficial disponible ni con la otra referencia comparada. Esto no certifica la autenticidad ni la seguridad del producto. Revisá también el envase y las fechas.']
+		};
+		const [title, description] = messages[identifierState];
+		identifierMessage = `<div class="identifier-message"><p><strong>${title}</strong></p><p>${description}</p><p>Ingresaste: <strong>${e(lotInput.value)}</strong></p></div>`;
 	}
 	const recommendations = a.recommendations.map(item => {
 		let text = e(item);
@@ -239,7 +272,7 @@ function showGuidedResult(a, identifierMatches = null, target = resultPanel) {
 		}
 		return `<li>${text}</li>`;
 	}).join('');
-	target.dataset.state = identifierMatches === null ? 'lot-unpublished' : identifierMatches ? 'identifier-match' : 'identifier-unmatched';
+	target.dataset.state = identifierState || 'lot-unpublished';
 	target.innerHTML = `
 		<article class="consultation-result">
 			${inline ? '' : `<p class="eyebrow">LA INFORMACIÓN DE TU PRODUCTO</p><h3 id="result-title" tabindex="-1">${e(a.brand + ' ' + a.name)}</h3>`}
@@ -249,19 +282,22 @@ function showGuidedResult(a, identifierMatches = null, target = resultPanel) {
 			<section class="result-section">
 				<h4>Qué pasó</h4>
 				${identifierMessage}
+				${isSanCor ? '<p class="identifier-safety"><strong>La ausencia de coincidencias no garantiza que el producto sea auténtico o seguro.</strong> Esta consulta no certifica productos.</p>' : ''}
 				<p>${e(a.reason)}</p>
 			</section>
 			<section class="result-section">
 				<h4>Qué mirar en el envase</h4>
 				<p${isPublished ? '' : ' class="unpublished-note"'}>${isPublished ? '' : '<strong>Lote no publicado.</strong> '}${e(a.lotNote)}</p>
-				${isPublished ? `<div class="published-identifier"><p>Lote que publicó la DIPA: <strong>${a.lots.map(e).join(' · ')}</strong></p>${a.manufactured ? `<p>Elaboración: ${e(a.manufactured)} · Vencimiento: ${e(a.expires)}</p>` : ''}</div>` : ''}
-				${a.irregularities.length ? `<div${a.brand === 'Nutrilon' ? ' class="product-warning"' : ''}><h5>Diferencias que informó la DIPA</h5><ul>${list(a.irregularities)}</ul></div>` : ''}
+				${isPublished ? `<div class="published-identifier"><p>Inscripción completa publicada por DIPA: <strong>${a.lots.map(e).join(' · ')}</strong></p>${a.comparisonIdentifiers?.length ? `<p>También comparamos con esta referencia: <strong>${a.comparisonIdentifiers.map(e).join(' · ')}</strong></p>` : ''}${a.manufactured ? `<div class="date-comparison"><p>Fechas publicadas por DIPA. Comparalas con las de tu envase:</p><p>Elaboración: <strong>${e(a.manufactured.replace(/20(\d{2})$/, '$1'))}</strong></p><p>Vencimiento: <strong>${e(a.expires.replace(/20(\d{2})$/, '$1'))}</strong></p></div>` : ''}</div>` : ''}
+				${isSanCor ? `<details class="package-checklist"><summary>Revisar características del envase (opcional)</summary><p>Marcá solo las diferencias que reconocés en tu envase, según lo descripto por DIPA. Si no podés compararlas, podés dejar la lista sin marcar. No marcar ninguna tampoco garantiza seguridad.</p><fieldset><legend>Diferencias que informó la DIPA</legend>${a.irregularities.map(item => `<label><input type="checkbox" name="package-concern"><span>${e(item)}</span></label>`).join('')}</fieldset><p class="package-concern-message" role="status" hidden>Marcaste una característica sospechosa. Esto no confirma una falsificación. Revisá las recomendaciones de DIPA y el comunicado oficial que aparecen debajo.</p></details>` : a.irregularities.length ? `<div class="product-warning"><h5>Diferencias que informó la DIPA</h5><ul>${list(a.irregularities)}</ul></div>` : ''}
 			</section>
+			${isSanCor ? `<details class="result-advice"${identifierState !== 'identifier-unmatched' ? ' open' : ''}><summary>Ver recomendaciones de DIPA y comunicado oficial</summary>` : ''}
 			<section class="result-recommendations">
 				<h4>Qué recomienda la DIPA</h4>
 				<ul>${recommendations}</ul>
 			</section>
 			<a class="button primary result-source" href="${e(a.sourceUrl)}" target="_blank" rel="noopener noreferrer">Leer el comunicado oficial ${icon('external')}<span class="sr-only"> (abre una pestaña nueva)</span></a>
+			${isSanCor ? '</details>' : ''}
 			<details class="product-data">
 				<summary>Datos del producto</summary>
 				<dl><div><dt>Denominación publicada</dt><dd>${e(a.officialName)}</dd></div><div><dt>RNPA</dt><dd>${e(a.rnpa || 'No publicado')}</dd></div><div><dt>RNE</dt><dd>${e(a.rne || 'No publicado')}</dd></div></dl>
@@ -309,18 +345,28 @@ document.querySelector('#presentation-options').addEventListener('click', event 
 lotForm.addEventListener('submit', event => {
 	event.preventDefault();
 	if (!selectedAlert || lotForm.hidden) return;
-	const enteredLot = lotInput.value.trim().toUpperCase();
-	if (!/^L:Y\d{3} F-\d{9}$/.test(enteredLot)) {
+	const state = compareIdentifier(lotInput.value, selectedAlert);
+	if (state === 'invalid' || state === 'incomplete') {
 		clearGuidedResult();
-		document.querySelector('#lot-feedback').textContent = 'El formato no es válido. Usá 18 caracteres, con este formato: L:Y025 F-022308674.';
+		document.querySelector('#lot-feedback').textContent = state === 'incomplete'
+			? 'El código parece incompleto. Copiá toda la inscripción del lote, con sus letras y números. No podemos comparar un fragmento.'
+			: 'El formato no es válido. Copiá la inscripción completa del lote, con sus letras, números y separadores.';
 		lotInput.setAttribute('aria-invalid', 'true');
 		lotInput.focus();
 		return;
 	}
-	const identifier = normalizeLot(enteredLot);
 	document.querySelector('#lot-feedback').textContent = '';
 	lotInput.removeAttribute('aria-invalid');
-	showGuidedResult(selectedAlert, selectedAlert.lots.some(lot => normalizeLot(lot) === identifier));
+	showGuidedResult(selectedAlert, state);
+});
+
+resultPanel.addEventListener('change', event => {
+	if (!event.target.matches('[name="package-concern"]')) return;
+	const hasConcern = [...resultPanel.querySelectorAll('[name="package-concern"]')].some(input => input.checked);
+	resultPanel.querySelector('.package-concern-message').hidden = !hasConcern;
+	const advice = resultPanel.querySelector('.result-advice');
+	advice.classList.toggle('has-concern', hasConcern);
+	if (hasConcern) advice.open = true;
 });
 
 lotInput.addEventListener('input', () => {

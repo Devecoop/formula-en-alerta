@@ -17,6 +17,9 @@
       "lots": [
         "L:Y010 F-011207563"
       ],
+      "comparisonIdentifiers": [
+        "L F-011207563"
+      ],
       "lotAvailability": "published",
       "manufactured": "10/01/2026",
       "expires": "10/01/2027",

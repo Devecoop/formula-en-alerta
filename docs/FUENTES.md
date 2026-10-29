@@ -19,4 +19,6 @@ La sección de fuentes se limita a los documentos de registros publicados en el 
 
 Los datos sobre productos, identificadores, recomendaciones y contactos se toman de esos documentos. La coincidencia con un lote no autentica un envase individual. Los dos registros Nutrilon no publican número de lote en el texto consultado; el identificador de SanCor debe leerse junto con las diferencias materiales descriptas.
 
+La búsqueda del comunicado SanCor se volvió a revisar para la comparación de identificadores: publica `L:Y010 F-011207563`, elaboración `10/01/26` y vencimiento `10/01/27`. Se conserva la inscripción completa en `lots`. La referencia adicional `L F-011207563` fue solicitada para la consulta y se mantiene separada en `comparisonIdentifiers`; no se presenta como transcripción del comunicado DIPA. Ambas se comparan explícitamente: `Y010` no se elimina por normalización. La distancia de edición es una ayuda de consulta y no una regla de identificación publicada por DIPA.
+
 La apertura directa del comunicado SanCor falló en la herramienta de investigación; se pudo consultar el texto de la misma URL oficial mediante búsqueda y se comprobó su presencia en el listado alimentario provincial. La disponibilidad puede cambiar: revisar los enlaces antes de publicar. No se usaron medios, blogs o redes sociales para completar los registros.
