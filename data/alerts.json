@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 1,
+  "coverage": "Selección inicial de tres alertas de la DIPA. Esta base es parcial y no reúne todas las alertas alimentarias de Argentina.",
+  "alerts": [
+    {
+      "id": "sancor-bebe-1-advanced-2026-10-28",
+      "status": "published",
+      "brand": "SanCor",
+      "name": "Bebé 1 Advanced",
+      "aliases": [
+        "San Cor",
+        "Sancor Bebe"
+      ],
+      "officialName": "Fórmula infantil en polvo",
+      "rne": "08-000019",
+      "rnpa": "08-002519",
+      "lots": [
+        "L:Y010 F-011207563"
+      ],
+      "lotAvailability": "published",
+      "manufactured": "10/01/2026",
+      "expires": "10/01/2027",
+      "publishedAt": "2026-10-28",
+      "agency": "DIPA · Ministerio de Desarrollo Agrario de la Provincia de Buenos Aires",
+      "type": "Alerta por falsificación",
+      "reason": "Según la DIPA, tras un reclamo, la elaboradora reconoció diferencias respecto del producto legítimo que indicarían una falsificación.",
+      "irregularities": [
+        "Diferencias de color y troquelado de los envases.",
+        "Sellado y marcación del pouch diferentes.",
+        "Cucharas dosificadoras más pequeñas, aparentemente impresas en 3D.",
+        "Errores tipográficos: «Adventencia» y «oelico»."
+      ],
+      "recommendations": [
+        "No consumir los productos señalados en el comunicado.",
+        "Quienes los comercialicen deben dejar de venderlos.",
+        "Consumir productos que cuenten con la autorización correspondiente."
+      ],
+      "lotNote": "La autoridad vincula el identificador con diferencias materiales del envase. Coincidir con el número no determina por sí solo que una unidad sea falsificada ni certifica su estado.",
+      "contacts": [
+        {
+          "label": "DIPA · WhatsApp",
+          "value": "(0221) 522-5835",
+          "url": "https://wa.me/5492215225835"
+        },
+        {
+          "label": "DIPA · correo",
+          "value": "vigilancia.dipa@mda.gba.gob.ar",
+          "url": "mailto:vigilancia.dipa@mda.gba.gob.ar"
+        },
+        {
+          "label": "DIPA · teléfono",
+          "value": "(0221) 422-4634",
+          "url": "tel:+542214224634"
+        }
+      ],
+      "sourceUrl": "https://www.gba.gob.ar/desarrollo_agrario/alertas_alimentarias/sancor-bebe",
+      "sourceTitle": "DIPA · Alerta alimentaria: SanCor Bebé 1 Advanced",
+      "reviewedAt": "2026-10-29",
+      "presentationLabel": "SanCor Bebé 1 Advanced"
+    },
+    {
+      "id": "nutrilon-ar1-2026-10-27",
+      "status": "published",
+      "brand": "Nutrilon",
+      "name": "AR1",
+      "aliases": [
+        "AR 1"
+      ],
+      "officialName": "Alimento para propósitos médicos específicos, en polvo, con ácidos grasos poliinsaturados de cadena larga y nucleótidos. Para lactantes de 0 a 6 meses. Libre de gluten.",
+      "rne": "02-031.124",
+      "rnpa": "02-700580",
+      "lots": [],
+      "lotAvailability": "not_published",
+      "manufactured": null,
+      "expires": null,
+      "publishedAt": "2026-10-27",
+      "agency": "DIPA · Ministerio de Desarrollo Agrario de la Provincia de Buenos Aires",
+      "type": "Alerta por falsificación",
+      "reason": "La DIPA informa que el fabricante no reconoce la codificación denunciada como propia. Se desconoce el lugar de elaboración del producto señalado.",
+      "irregularities": [
+        "Codificación de lote diferente de la utilizada por el fabricante."
+      ],
+      "recommendations": [
+        "Consultar al fabricante por la codificación del lote: 0800-777-6388.",
+        "No consumir los productos señalados en el comunicado.",
+        "Quienes los comercialicen deben dejar de venderlos.",
+        "Consumir productos que cuenten con la autorización correspondiente."
+      ],
+      "lotNote": "El comunicado no publica un número de lote. No es posible comparar un lote individual ni extender la alerta a todos los lotes de la marca.",
+      "contacts": [
+        {
+          "label": "Fabricante · atención al consumidor",
+          "value": "0800-777-6388",
+          "url": "tel:08007776388"
+        },
+        {
+          "label": "DIPA · WhatsApp",
+          "value": "(0221) 522-5835",
+          "url": "https://wa.me/5492215225835"
+        },
+        {
+          "label": "DIPA · correo",
+          "value": "vigilancia.dipa@mda.gba.gob.ar",
+          "url": "mailto:vigilancia.dipa@mda.gba.gob.ar"
+        }
+      ],
+      "sourceUrl": "https://gba.gob.ar/desarrollo_agrario/alertas_alimentarias/nutrilon1",
+      "sourceTitle": "DIPA · Alerta alimentaria: Nutrilon AR1",
+      "reviewedAt": "2026-10-29",
+      "presentationLabel": "Nutrilon AR1 — de 0 a 6 meses"
+    },
+    {
+      "id": "nutrilon-formula-lactea-2026-10-01",
+      "status": "published",
+      "brand": "Nutrilon",
+      "name": "Fórmula láctea",
+      "aliases": [],
+      "officialName": "Fórmula láctea para lactantes, en polvo. Con prebióticos, ácidos grasos poliinsaturados de cadena larga y nucleótidos. Libre de gluten.",
+      "rne": "02-031.124",
+      "rnpa": "02-700261",
+      "lots": [],
+      "lotAvailability": "not_published",
+      "manufactured": null,
+      "expires": null,
+      "publishedAt": "2026-10-01",
+      "agency": "DIPA · Ministerio de Desarrollo Agrario de la Provincia de Buenos Aires",
+      "type": "Alerta por falsificación",
+      "reason": "Según la DIPA, el titular de los registros informó que no elabora el producto denunciado. La autoridad advierte una falsificación de origen desconocido.",
+      "irregularities": [
+        "Rótulo antiguo.",
+        "Lote y fechas de elaboración y vencimiento adulterados, con diferencias en el método de impresión."
+      ],
+      "recommendations": [
+        "No consumir los productos señalados en el comunicado.",
+        "Quienes los comercialicen deben dejar de venderlos.",
+        "Consumir productos que cuenten con la autorización correspondiente."
+      ],
+      "lotNote": "El comunicado no publica un número de lote. No es posible comparar un lote individual ni extender la alerta a todos los lotes de la marca.",
+      "contacts": [
+        {
+          "label": "DIPA · WhatsApp",
+          "value": "(0221) 522-5835",
+          "url": "https://wa.me/5492215225835"
+        },
+        {
+          "label": "DIPA · correo",
+          "value": "vigilancia.dipa@mda.gba.gob.ar",
+          "url": "mailto:vigilancia.dipa@mda.gba.gob.ar"
+        }
+      ],
+      "sourceUrl": "https://www.gba.gob.ar/desarrollo_agrario/alertas_alimentarias/nutrilon",
+      "sourceTitle": "DIPA · Alerta alimentaria: Nutrilon, fórmula láctea",
+      "reviewedAt": "2026-10-29",
+      "presentationLabel": "Nutrilon fórmula láctea con prebióticos"
+    }
+  ],
+  "config": {
+    "name": "En alerta",
+    "institutionalUrl": "https://devecoop.com/"
+  }
+}
